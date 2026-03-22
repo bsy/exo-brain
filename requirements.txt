@@ -1,0 +1,7 @@
+google-genai
+python-dotenv
+python-docx
+python-pptx
+pillow
+pdfplumber
+openpyxl
