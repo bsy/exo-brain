@@ -8,28 +8,21 @@
 
 [Obsidian](https://obsidian.md) + [Claude Code](https://claude.ai/code) · Local · Private · One command
 
-```
-  Your files (PDFs, docs, notes)
-          │
-          ▼
-  ┌───────────────────┐
-  │   Obsidian vault  │  ← plain .md files on your computer
-  │  inbox/  daily/   │
-  │  projects/  ...   │
-  └────────┬──────────┘
-           │  Claude Code reads this folder
-           ▼
-  ┌───────────────────┐
-  │   Claude Code     │  ← knows your projects, voice, context
-  │   /daily  /close  │     before you type a single word
-  │   /emerge /ideas  │
-  └───────────────────┘
-           │
-           ▼
-    AI that compounds.
-    Session 1: knows your folders.
-    Session 20: knows your work better
-    than you consciously remember.
+```mermaid
+flowchart TD
+    A["📄 Your files\n(PDFs, docs, notes)"]
+    B["🗄️ Obsidian vault\ninbox/ · daily/ · projects/ · research/\nplain .md files on your computer"]
+    C["🤖 Claude Code\n/daily · /close · /emerge · /ideas\nknows your projects, voice, context"]
+    D["✨ AI that compounds\nSession 1 → knows your folders\nSession 20 → knows your work\nbetter than you consciously remember"]
+
+    A -->|"drop in"| B
+    B -->|"reads your vault"| C
+    C -->|"gets sharper over time"| D
+
+    style A fill:#f3e8ff,stroke:#8A2BE2,color:#1a1a2e
+    style B fill:#f3e8ff,stroke:#8A2BE2,color:#1a1a2e
+    style C fill:#e8d5ff,stroke:#8A2BE2,color:#1a1a2e
+    style D fill:#dcc5ff,stroke:#8A2BE2,color:#1a1a2e
 ```
 
 </div>
