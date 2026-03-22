@@ -49,9 +49,15 @@ Here's your vault — ready to build when you are.
 └── archive/        Completed work — never deleted, just moved
 
 Slash commands:
-  /daily    — start your day with vault context
-  /tldr     — save any session to the right folder
-  /[role]   — [role-specific one-liner]
+  /my-world   — load your full vault context
+  /daily      — start your day with vault context
+  /close      — end-of-day review and follow-ups
+  /tldr       — save any session to the right folder
+  /challenge  — stress-test a belief with your own notes
+  /emerge     — surface hidden patterns in your vault
+  /connect    — bridge two domains unexpectedly
+  /ideas      — extract actions from recent notes
+  /[role]     — [role-specific one-liner]
 
 Type "build it" to create this, or tell me what to change.
 ```
@@ -158,9 +164,15 @@ One manual step left:
   Obsidian → Settings → General → Enable Command Line Interface
 
 Your slash commands:
-  /daily    — run this tomorrow morning
-  /tldr     — run this at the end of any session
-  /[role]   — [one liner]
+  /my-world   — load your full context into any session
+  /daily      — run this tomorrow morning
+  /close      — run this before you sign off
+  /tldr       — save any session to the vault
+  /challenge  — stress-test your thinking
+  /emerge     — find patterns you haven't noticed
+  /connect    — bridge two topics unexpectedly
+  /ideas      — turn recent notes into actions
+  /[role]     — [one liner]
 
 Have files to import?
   python scripts/process_docs_to_obsidian.py ~/your-files inbox/

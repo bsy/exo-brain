@@ -83,7 +83,8 @@ echo -e "  ${PURPLE}Python packages${RESET}       Background libraries used by G
 echo -e "                        and synthesize your existing files (PDFs, docs, slides)."
 echo ""
 echo -e "  ${PURPLE}Vault skills${RESET}          Slash commands that teach Claude how to use your vault:"
-echo -e "                        /vault-setup  /daily  /tldr  /file-intel"
+echo -e "                        /vault-setup  /daily  /close  /tldr  /my-world"
+echo -e "                        /challenge  /emerge  /connect  /ideas  /file-intel"
 echo ""
 echo -e "  ${PURPLE}Obsidian Skills${RESET}       Official skills by Kepano (Obsidian CEO) — lets Claude"
 echo -e "  ${DIM}(optional)${RESET}            navigate your vault using the Obsidian CLI."
@@ -211,7 +212,8 @@ if [ "$HAS_OBSIDIAN_FOLDER" = true ] || [ "$IS_NON_EMPTY" = true ]; then
   echo -e "  We found existing files here. The script will:"
   echo ""
   echo -e "  ${GREEN}+${RESET} Add missing folders (inbox/, daily/, projects/, etc.)"
-  echo -e "  ${GREEN}+${RESET} Install 4 slash commands: /vault-setup /daily /tldr /file-intel"
+  echo -e "  ${GREEN}+${RESET} Install 10 slash commands: /vault-setup /daily /close /tldr /my-world"
+  echo -e "     /challenge /emerge /connect /ideas /file-intel"
   echo -e "  ${GREEN}+${RESET} Copy helper scripts to scripts/"
   echo -e "  ${GREEN}+${RESET} Install skills globally to ~/.claude/skills/"
   if [ "$HAS_EXISTING_CLAUDE" = true ]; then
@@ -241,7 +243,16 @@ if [ "$HAS_OBSIDIAN_FOLDER" = true ] || [ "$IS_NON_EMPTY" = true ]; then
   fi
 fi
 
-mkdir -p "$VAULT_PATH"/{inbox,daily,projects,research,archive,scripts,.claude/skills/vault-setup,.claude/skills/daily,.claude/skills/tldr,.claude/skills/file-intel}
+mkdir -p "$VAULT_PATH"/{inbox,daily,projects,research,archive,scripts}
+
+# Install all skills locally and globally
+SKILLS="vault-setup daily close tldr my-world challenge emerge connect ideas file-intel"
+for skill in $SKILLS; do
+  mkdir -p "$VAULT_PATH/.claude/skills/$skill"
+  safe_cp "$SCRIPT_DIR/skills/$skill/SKILL.md" "$VAULT_PATH/.claude/skills/$skill/SKILL.md"
+  mkdir -p "$HOME/.claude/skills/$skill"
+  safe_cp "$SCRIPT_DIR/skills/$skill/SKILL.md" "$HOME/.claude/skills/$skill/SKILL.md"
+done
 
 # Copy core files using safe_cp (won't crash if source is missing)
 safe_cp "$SCRIPT_DIR/CLAUDE.md"  "$VAULT_PATH/CLAUDE.md"
@@ -251,20 +262,8 @@ if [ "$IS_EXISTING_VAULT" = false ] || [ ! -f "$VAULT_PATH/memory.md" ]; then
   safe_cp "$SCRIPT_DIR/memory.md"  "$VAULT_PATH/memory.md"
 fi
 
-safe_cp "$SCRIPT_DIR/skills/vault-setup/SKILL.md" "$VAULT_PATH/.claude/skills/vault-setup/SKILL.md"
-safe_cp "$SCRIPT_DIR/skills/daily/SKILL.md"       "$VAULT_PATH/.claude/skills/daily/SKILL.md"
-safe_cp "$SCRIPT_DIR/skills/tldr/SKILL.md"        "$VAULT_PATH/.claude/skills/tldr/SKILL.md"
-safe_cp "$SCRIPT_DIR/skills/file-intel/SKILL.md"  "$VAULT_PATH/.claude/skills/file-intel/SKILL.md"
 safe_cp "$SCRIPT_DIR/scripts/process_docs_to_obsidian.py" "$VAULT_PATH/scripts/process_docs_to_obsidian.py"
 safe_cp "$SCRIPT_DIR/scripts/process_files_with_gemini.py" "$VAULT_PATH/scripts/process_files_with_gemini.py"
-
-# Also install skills globally so they work in ANY folder, not just the vault
-mkdir -p "$HOME/.claude/skills/vault-setup" "$HOME/.claude/skills/daily" \
-         "$HOME/.claude/skills/tldr" "$HOME/.claude/skills/file-intel"
-safe_cp "$SCRIPT_DIR/skills/vault-setup/SKILL.md" "$HOME/.claude/skills/vault-setup/SKILL.md"
-safe_cp "$SCRIPT_DIR/skills/daily/SKILL.md"       "$HOME/.claude/skills/daily/SKILL.md"
-safe_cp "$SCRIPT_DIR/skills/tldr/SKILL.md"        "$HOME/.claude/skills/tldr/SKILL.md"
-safe_cp "$SCRIPT_DIR/skills/file-intel/SKILL.md"  "$HOME/.claude/skills/file-intel/SKILL.md"
 
 if [ "$IS_EXISTING_VAULT" = true ]; then
   echo -e "  ${GREEN}✓${RESET} Skills + scripts added to existing vault at $VAULT_PATH"
@@ -424,7 +423,8 @@ if [ "$IS_EXISTING_VAULT" = true ]; then
   echo -e "  ${GREEN}✅ Your vault is upgraded.${RESET}"
   echo ""
   echo -e "  ${WHITE}What you just got:${RESET}"
-  echo -e "  - 4 slash commands: /vault-setup /daily /tldr /file-intel"
+  echo -e "  - 10 slash commands: /vault-setup /daily /close /tldr /my-world"
+  echo -e "    /challenge /emerge /connect /ideas /file-intel"
   if [ "$HAS_EXISTING_CLAUDE" = true ]; then
     echo -e "  - New CLAUDE.md template (your original backed up as $BACKUP_NAME)"
   else
@@ -436,7 +436,8 @@ else
   echo -e "  ${GREEN}✅ Your exo brain is ready.${RESET}"
   echo ""
   echo -e "  ${WHITE}What you just got:${RESET}"
-  echo -e "  - 4 slash commands: /vault-setup /daily /tldr /file-intel"
+  echo -e "  - 10 slash commands: /vault-setup /daily /close /tldr /my-world"
+  echo -e "    /challenge /emerge /connect /ideas /file-intel"
   echo -e "  - CLAUDE.md template (personalize it with /vault-setup)"
   echo -e "  - Vault folder structure for organizing your notes"
   echo -e "  - File processing scripts (optional, needs Gemini API key)"

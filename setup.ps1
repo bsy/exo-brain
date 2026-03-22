@@ -102,7 +102,8 @@ Write-Host "  ${Purple}Python packages${Reset}       Background libraries used b
 Write-Host "                        and synthesize your existing files (PDFs, docs, slides)."
 Write-Host ""
 Write-Host "  ${Purple}Vault skills${Reset}          Slash commands that teach Claude how to use your vault:"
-Write-Host "                        /vault-setup  /daily  /tldr  /file-intel"
+Write-Host "                        /vault-setup  /daily  /close  /tldr  /my-world"
+Write-Host "                        /challenge  /emerge  /connect  /ideas  /file-intel"
 Write-Host ""
 Write-Host "  ${Purple}Obsidian Skills${Reset}       Official skills by Kepano (Obsidian CEO) - lets Claude"
 Write-Host "  ${Dim}(optional)${Reset}            navigate your vault using the Obsidian CLI."
@@ -256,7 +257,8 @@ if ($hasObsidianFolder -or $isNonEmptyDir) {
     Write-Host "  We found existing files here. The script will:"
     Write-Host ""
     Write-Host "  ${Green}+${Reset} Add missing folders (inbox/, daily/, projects/, etc.)"
-    Write-Host "  ${Green}+${Reset} Install 4 slash commands: /vault-setup /daily /tldr /file-intel"
+    Write-Host "  ${Green}+${Reset} Install 10 slash commands: /vault-setup /daily /close /tldr /my-world"
+    Write-Host "     /challenge /emerge /connect /ideas /file-intel"
     Write-Host "  ${Green}+${Reset} Copy helper scripts to scripts/"
     Write-Host "  ${Green}+${Reset} Install skills globally to $env:USERPROFILE\.claude\skills\"
     if ($hasExistingClaude) {
@@ -294,24 +296,27 @@ New-Item -ItemType Directory -Force -Path "$vaultPath\projects" | Out-Null
 New-Item -ItemType Directory -Force -Path "$vaultPath\research" | Out-Null
 New-Item -ItemType Directory -Force -Path "$vaultPath\archive" | Out-Null
 New-Item -ItemType Directory -Force -Path "$vaultPath\scripts" | Out-Null
-New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\vault-setup" | Out-Null
-New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\daily" | Out-Null
-New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\tldr" | Out-Null
-New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\file-intel" | Out-Null
 
-# Copy core files (with existence checks to handle partial repo downloads)
+# Install all skills locally
+$allSkills = @("vault-setup", "daily", "close", "tldr", "my-world", "challenge", "emerge", "connect", "ideas", "file-intel")
 $copyErrors = 0
-foreach ($src in @(
-    @("$scriptDir\CLAUDE.md", "$vaultPath\CLAUDE.md"),
-    @("$scriptDir\skills\vault-setup\SKILL.md", "$vaultPath\.claude\skills\vault-setup\SKILL.md"),
-    @("$scriptDir\skills\daily\SKILL.md", "$vaultPath\.claude\skills\daily\SKILL.md"),
-    @("$scriptDir\skills\tldr\SKILL.md", "$vaultPath\.claude\skills\tldr\SKILL.md"),
-    @("$scriptDir\skills\file-intel\SKILL.md", "$vaultPath\.claude\skills\file-intel\SKILL.md")
-)) {
-    if (Test-Path $src[0]) {
-        Copy-Item $src[0] $src[1] -Force
+
+# Copy CLAUDE.md
+if (Test-Path "$scriptDir\CLAUDE.md") {
+    Copy-Item "$scriptDir\CLAUDE.md" "$vaultPath\CLAUDE.md" -Force
+} else {
+    Write-Host "  ${Orange}WARNING${Reset}  Missing: $scriptDir\CLAUDE.md"
+    $copyErrors++
+}
+
+# Copy skills
+foreach ($skill in $allSkills) {
+    New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\$skill" | Out-Null
+    $src = "$scriptDir\skills\$skill\SKILL.md"
+    if (Test-Path $src) {
+        Copy-Item $src "$vaultPath\.claude\skills\$skill\SKILL.md" -Force
     } else {
-        Write-Host "  ${Orange}WARNING${Reset}  Missing: $($src[0])"
+        Write-Host "  ${Orange}WARNING${Reset}  Missing: $src"
         $copyErrors++
     }
 }
@@ -338,7 +343,7 @@ if ($copyErrors -gt 0) {
 
 # Install skills globally (so they work in ANY folder, not just the vault)
 $globalSkillsPath = "$env:USERPROFILE\.claude\skills"
-foreach ($skill in @("vault-setup", "daily", "tldr", "file-intel")) {
+foreach ($skill in $allSkills) {
     New-Item -ItemType Directory -Force -Path "$globalSkillsPath\$skill" | Out-Null
     if (Test-Path "$scriptDir\skills\$skill\SKILL.md") {
         Copy-Item "$scriptDir\skills\$skill\SKILL.md" "$globalSkillsPath\$skill\SKILL.md" -Force
@@ -535,7 +540,8 @@ if ($isExistingVault) {
     Write-Host "  ${Green}Your vault is upgraded.${Reset}"
     Write-Host ""
     Write-Host "  ${White}What you just got:${Reset}"
-    Write-Host "  - 4 slash commands: /vault-setup /daily /tldr /file-intel"
+    Write-Host "  - 10 slash commands: /vault-setup /daily /close /tldr /my-world"
+    Write-Host "    /challenge /emerge /connect /ideas /file-intel"
     if ($hasExistingClaude) {
         Write-Host "  - New CLAUDE.md template (your original backed up as $backupName)"
     } else {
@@ -547,7 +553,8 @@ if ($isExistingVault) {
     Write-Host "  ${Green}Your exo brain is ready.${Reset}"
     Write-Host ""
     Write-Host "  ${White}What you just got:${Reset}"
-    Write-Host "  - 4 slash commands: /vault-setup /daily /tldr /file-intel"
+    Write-Host "  - 10 slash commands: /vault-setup /daily /close /tldr /my-world"
+    Write-Host "    /challenge /emerge /connect /ideas /file-intel"
     Write-Host "  - CLAUDE.md template (personalize it with /vault-setup)"
     Write-Host "  - Vault folder structure for organizing your notes"
     Write-Host "  - File processing scripts (optional, needs Gemini API key)"

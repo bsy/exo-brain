@@ -21,8 +21,8 @@
            ▼
   ┌───────────────────┐
   │   Claude Code     │  ← knows your projects, voice, context
-  │   /vault-setup    │     before you type a single word
-  │   /daily  /tldr   │
+  │   /daily  /close  │     before you type a single word
+  │   /emerge /ideas  │
   └───────────────────┘
            │
            ▼
@@ -134,7 +134,7 @@ Then run `/vault-setup` in Claude Code. It interviews you and generates a person
 | **Obsidian** | Local markdown editor | Your notes are plain files on disk. No vendor, no subscription, yours forever. |
 | **Claude Code** | AI terminal agent | Reads and writes directly in your vault. No copy-paste, no tab-switching. |
 | **Python packages** | File processing libs | Gemini 3 Flash uses these to read PDFs, docs, and slides. |
-| **Vault skills** | 4 slash commands | `/vault-setup` `/daily` `/tldr` `/file-intel` |
+| **Vault skills** | 10 slash commands | `/vault-setup` `/daily` `/close` `/tldr` `/my-world` `/challenge` `/emerge` `/connect` `/ideas` `/file-intel` |
 | **Obsidian Skills** *(opt-in)* | [Kepano's](https://github.com/kepano) official skills | Claude navigates your vault via the Obsidian CLI |
 
 > **Nothing leaves your machine.** The vault is a local folder. Claude reads it locally. The only network call is optional Gemini file processing.
@@ -178,14 +178,36 @@ Claude interviews you — role, projects, goals — then builds a `CLAUDE.md` an
 
 ## Slash Commands
 
-Four ship out of the box. More accumulate as you use the system.
+Ten ship out of the box. More accumulate as you use the system.
+
+### Setup & File Processing
 
 | Command | Does |
 |---------|------|
 | `/vault-setup` | Interviews you, generates your personalized vault structure + CLAUDE.md + custom commands |
-| `/daily` | Morning kickoff — reads or creates today's note, surfaces priorities, asks what's on deck |
-| `/tldr` | End-of-session — captures decisions, takeaways, next actions into the right vault folder |
 | `/file-intel` | Aim it at any folder — Gemini reads every file, generates Obsidian-ready summaries |
+
+### Daily Rituals
+
+| Command | Does |
+|---------|------|
+| `/my-world` | Loads your full vault context — projects, priorities, recent notes — into one session |
+| `/daily` | Morning kickoff — reads or creates today's note, surfaces priorities, asks what's on deck |
+| `/close` | End-of-day review — extracts action items, surfaces missed connections, seeds tomorrow |
+| `/tldr` | End-of-session — captures decisions, takeaways, next actions into the right vault folder |
+
+### Thinking Tools
+
+These use your vault as raw material for insight — not organization, but actual thinking.
+
+| Command | Does |
+|---------|------|
+| `/challenge` | Stress-tests a belief or decision using your own historical notes as evidence |
+| `/emerge` | Scans for patterns implied by your notes but never explicitly written down |
+| `/connect` | Bridges two domains (e.g. "investing" + "health") by walking your notes for unexpected links |
+| `/ideas` | Scans the last 30 days of notes and extracts concrete actions: things to build, write, start, or stop |
+
+> **Agents read, humans write.** The thinking tools analyze your notes and respond in the session — they never write into your vault. Your notes stay purely your own thinking, which keeps tools like `/emerge` honest: they detect *your* patterns, not ones the AI planted.
 
 > Skills install both locally and globally (`~/.claude/skills/`), so they work from any directory.
 
@@ -260,8 +282,14 @@ exo-brain/
 │   └── process_files_with_gemini.py     Batch file analyzer
 ├── skills/
 │   ├── vault-setup/SKILL.md             Vault configurator
-│   ├── daily/SKILL.md                   Daily standup
+│   ├── daily/SKILL.md                   Morning kickoff
+│   ├── close/SKILL.md                   End-of-day review
 │   ├── tldr/SKILL.md                    Session summary
+│   ├── my-world/SKILL.md               Full context load
+│   ├── challenge/SKILL.md              Stress-test your thinking
+│   ├── emerge/SKILL.md                 Surface hidden patterns
+│   ├── connect/SKILL.md                Bridge two domains
+│   ├── ideas/SKILL.md                  Notes → action items
 │   └── file-intel/SKILL.md             Folder processor
 └── vault-template/
     ├── inbox/   daily/   projects/
@@ -303,20 +331,19 @@ python3 -m venv ~/.exo-brain-venv
 **5. Vault setup**
 ```bash
 git clone https://github.com/bsy/exo-brain.git
-mkdir -p ~/exo-brain/{inbox,daily,projects,research,archive,.claude/skills/vault-setup,.claude/skills/daily,.claude/skills/tldr,.claude/skills/file-intel,scripts}
+mkdir -p ~/exo-brain/{inbox,daily,projects,research,archive,scripts}
+for skill in vault-setup daily close tldr my-world challenge emerge connect ideas file-intel; do
+  mkdir -p ~/exo-brain/.claude/skills/$skill
+  cp exo-brain/skills/$skill/SKILL.md ~/exo-brain/.claude/skills/$skill/
+done
 cp exo-brain/CLAUDE.md exo-brain/memory.md ~/exo-brain/
-cp exo-brain/skills/vault-setup/SKILL.md ~/exo-brain/.claude/skills/vault-setup/
-cp exo-brain/skills/daily/SKILL.md ~/exo-brain/.claude/skills/daily/
-cp exo-brain/skills/tldr/SKILL.md ~/exo-brain/.claude/skills/tldr/
-cp exo-brain/skills/file-intel/SKILL.md ~/exo-brain/.claude/skills/file-intel/
 cp exo-brain/scripts/* ~/exo-brain/scripts/
 cp exo-brain/.env.example ~/exo-brain/.env
 # Global skills (work from any folder):
-mkdir -p ~/.claude/skills/{vault-setup,daily,tldr,file-intel}
-cp exo-brain/skills/vault-setup/SKILL.md ~/.claude/skills/vault-setup/
-cp exo-brain/skills/daily/SKILL.md ~/.claude/skills/daily/
-cp exo-brain/skills/tldr/SKILL.md ~/.claude/skills/tldr/
-cp exo-brain/skills/file-intel/SKILL.md ~/.claude/skills/file-intel/
+for skill in vault-setup daily close tldr my-world challenge emerge connect ideas file-intel; do
+  mkdir -p ~/.claude/skills/$skill
+  cp exo-brain/skills/$skill/SKILL.md ~/.claude/skills/$skill/
+done
 ```
 
 **6. API key** — Edit `~/exo-brain/.env`, paste your key from [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
@@ -360,21 +387,21 @@ Close and reopen PowerShell.
 ```powershell
 git clone https://github.com/bsy/exo-brain.git
 $vault = "$env:USERPROFILE\exo-brain"
-New-Item -ItemType Directory -Force -Path "$vault\inbox","$vault\daily","$vault\projects","$vault\research","$vault\archive","$vault\scripts","$vault\.claude\skills\vault-setup","$vault\.claude\skills\daily","$vault\.claude\skills\tldr","$vault\.claude\skills\file-intel" | Out-Null
+New-Item -ItemType Directory -Force -Path "$vault\inbox","$vault\daily","$vault\projects","$vault\research","$vault\archive","$vault\scripts" | Out-Null
+$skills = @("vault-setup","daily","close","tldr","my-world","challenge","emerge","connect","ideas","file-intel")
+foreach ($s in $skills) {
+    New-Item -ItemType Directory -Force -Path "$vault\.claude\skills\$s" | Out-Null
+    Copy-Item "exo-brain\skills\$s\SKILL.md" "$vault\.claude\skills\$s\"
+}
 Copy-Item "exo-brain\CLAUDE.md","exo-brain\memory.md" $vault
-Copy-Item "exo-brain\skills\vault-setup\SKILL.md" "$vault\.claude\skills\vault-setup\"
-Copy-Item "exo-brain\skills\daily\SKILL.md" "$vault\.claude\skills\daily\"
-Copy-Item "exo-brain\skills\tldr\SKILL.md" "$vault\.claude\skills\tldr\"
-Copy-Item "exo-brain\skills\file-intel\SKILL.md" "$vault\.claude\skills\file-intel\"
 Copy-Item "exo-brain\scripts\*" "$vault\scripts\"
 Copy-Item "exo-brain\.env.example" "$vault\.env"
 # Global skills:
 $global = "$env:USERPROFILE\.claude\skills"
-New-Item -ItemType Directory -Force -Path "$global\vault-setup","$global\daily","$global\tldr","$global\file-intel" | Out-Null
-Copy-Item "exo-brain\skills\vault-setup\SKILL.md" "$global\vault-setup\"
-Copy-Item "exo-brain\skills\daily\SKILL.md" "$global\daily\"
-Copy-Item "exo-brain\skills\tldr\SKILL.md" "$global\tldr\"
-Copy-Item "exo-brain\skills\file-intel\SKILL.md" "$global\file-intel\"
+foreach ($s in $skills) {
+    New-Item -ItemType Directory -Force -Path "$global\$s" | Out-Null
+    Copy-Item "exo-brain\skills\$s\SKILL.md" "$global\$s\"
+}
 ```
 
 **5. Python deps**
